@@ -8,7 +8,7 @@ class Model:
     def __init__(self, config):
         tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.FATAL)
         print(' - LOADING MODEL')
-        print(' | - Setting up model configuration')
+        print(' | - Setting up model configuration and classes')
         self.classes = config['classes']
         self.conf_threshold = config["conf_threshold"]
         print(' | - Loading weights')

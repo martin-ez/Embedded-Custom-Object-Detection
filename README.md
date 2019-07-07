@@ -1,6 +1,5 @@
 # Embedded Custom Object Detection
 
-___
 ## Setup
 As mention previously, this project aims to use a Raspberry Pi to detect objects, therefore this documentation is aim to setup the environment on that device. However, is not practical to do the model training on the Raspberry, so we encourage you to setup the environment on a machine that could use GPU to accelerate the training.
 

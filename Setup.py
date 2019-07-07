@@ -47,8 +47,8 @@ def main():
     zipped_model.close()
     rename(path.join(out_path, base_name), model_path)
     print(' | - Model downloaded correctly')
-    print(' | | - ' + model_name + ' ready to use')
-    print(' | | - Model Path: ', model_path)
+    print(' | | -' + model_name + 'ready to use')
+    print(' | | - Model Path:', model_path)
     print(' | ')
 
 if __name__ == '__main__':
