@@ -27,7 +27,7 @@ def main(image, out_folder):
     global output_path
     dirname = os.path.dirname(__file__)
     config = load_json(os.path.join(dirname, 'config.json'))
-    classes = load_json(os.path.join(dirname, 'classes.json'))
+    classes = load_json(os.path.join(dirname, config['inference']['class_map'] + '.json'))
     sample_rate = convert_sample_rate(config['inference']['sample_rate'])
     api_url = config['inference']['api_url']
     model_config = {

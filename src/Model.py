@@ -13,7 +13,7 @@ class Model:
         self.conf_threshold = config["conf_threshold"]
         print(' | - Loading weights')
         PATH_TO_FROZEN_GRAPH = os.path.join(config['model_path'], 'frozen_inference_graph.pb')
-        sys.path.append(os.path.join('..','..'))
+        sys.path.append('..')
         self.graph = tf.Graph()
         with self.graph.as_default():
             od_graph_def = tf.GraphDef()

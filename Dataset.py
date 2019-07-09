@@ -3,7 +3,7 @@ from sys import exit
 import xml.etree.ElementTree as ET
 from src.Helpers import load_json
 import tensorflow as tf
-import src.dataset_util as dataset_util
+from src.Dataset_Utils import int64_feature, bytes_feature, float_list_feature, bytes_list_feature, int64_list_feature
 
 dirname = os.path.dirname(__file__)
 classes = None
@@ -101,18 +101,18 @@ def generate_tf_example(img_data, path):
         ymaxs.append(obj['box'][3] / float(height))
 
     tf_example = tf.train.Example(features=tf.train.Features(feature={
-        'image/height': dataset_util.int64_feature(height),
-        'image/width': dataset_util.int64_feature(width),
-        'image/filename': dataset_util.bytes_feature(filename),
-        'image/source_id': dataset_util.bytes_feature(filename),
-        'image/encoded': dataset_util.bytes_feature(encoded_jpg),
-        'image/format': dataset_util.bytes_feature(image_format),
-        'image/object/bbox/xmin': dataset_util.float_list_feature(xmins),
-        'image/object/bbox/xmax': dataset_util.float_list_feature(xmaxs),
-        'image/object/bbox/ymin': dataset_util.float_list_feature(ymins),
-        'image/object/bbox/ymax': dataset_util.float_list_feature(ymaxs),
-        'image/object/class/text': dataset_util.bytes_list_feature(classes_text),
-        'image/object/class/label': dataset_util.int64_list_feature(classes),
+        'image/height': int64_feature(height),
+        'image/width': int64_feature(width),
+        'image/filename': bytes_feature(filename),
+        'image/source_id': bytes_feature(filename),
+        'image/encoded': bytes_feature(encoded_jpg),
+        'image/format': bytes_feature(image_format),
+        'image/object/bbox/xmin': float_list_feature(xmins),
+        'image/object/bbox/xmax': float_list_feature(xmaxs),
+        'image/object/bbox/ymin': float_list_feature(ymins),
+        'image/object/bbox/ymax': float_list_feature(ymaxs),
+        'image/object/class/text': bytes_list_feature(classes_text),
+        'image/object/class/label': int64_list_feature(classes),
     }))
     return tf_example
 
