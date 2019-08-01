@@ -1,13 +1,15 @@
 {
   "inference" : {
-    "model_name": "mobilenet_v2",
+    "model_name": "ssd_inception_v2",
+    "class_map": "COCO_classes",
     "sample_rate": "5s",
     "conf_threshold": 0.5,
     "api_url": "http://127.0.0.1:5000/detection"
   },
   "setup_training": {
     "out_model_name": "custom_model",
-    "base_model_name": "mobilenet_v2",
-    "base_model_url": "http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_coco_2018_03_29.tar.gz"
+    "base_model_name": "ssd_inception_v2",
+    "base_model_url": "http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz",
+    "training_class_map": "_classes",
   }
 }

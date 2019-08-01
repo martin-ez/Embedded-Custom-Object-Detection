@@ -20,19 +20,20 @@ tfrecord_paths = []
 def load_classes():
     global classes
     global class_instances
-    print(' | - Loading classes file')
-    classes = load_json(os.path.join(dirname, 'classes.json'))['classes']
+    print(' ├─ Loading classes file')
+    config = load_json(os.path.join(dirname, 'config.json'))
+    classes = load_json(os.path.join(dirname, config['setup_training']['training_class_map'] + '.json'))['classes']
     for folder in ['train', 'test']:
         for x in range(1, len(classes)):
             class_instances[folder][classes[x]] = 0
-    print(' | ')
+    print(' │ ')
 
 
 def read_folder(folder):
     folder_path = os.path.join(dirname, 'data', folder)
     print(' - CONVERTING IMAGES IN:', folder_path)
     files = []
-    print(' | - Reading xml files')
+    print(' ├─ Reading xml files')
     for xml_file in glob.glob(os.path.join(folder_path, '*.xml')):
         filename, size, objects = read_xml(xml_file, folder)
         files.append({
@@ -67,7 +68,7 @@ def read_xml(xml_file, folder):
 
 def write_tfrecord(labeled_imgs, folder):
     global tfrecord_paths
-    print(' | - Writing TFRecord')
+    print(' ├─ Writing TFRecord')
     out_path = os.path.join(dirname, 'data', folder+'.record')
     writer = tf.io.TFRecordWriter(out_path)
     images_path = os.path.join(dirname, 'data', folder)
@@ -76,8 +77,8 @@ def write_tfrecord(labeled_imgs, folder):
         writer.write(tf_example.SerializeToString())
     writer.close()
     tfrecord_paths.append(out_path)
-    print(' | | - TFRecord for', folder, 'set completed')
-    print(' | ')
+    print(' │ ├─ TFRecord for', folder, 'set completed')
+    print(' │ ')
 
 def generate_tf_example(img_data, path):
     with tf.io.gfile.GFile(os.path.join(path, img_data['filename']), 'rb') as fid:
@@ -122,16 +123,16 @@ def print_dataset_analysis():
     print(' - DATASET ANALYSIS')
     print('---------------------------------')
     for folder in ['train', 'test']:
-        print(' | -', folder.upper() + 'ING SET')
-        print(' | | - Total class instances:', total_objects[folder])
+        print(' ├─', folder.upper() + 'ING SET')
+        print(' │ ├─ Total class instances:', total_objects[folder])
         for cl, count in class_instances[folder].items():
-            print(' | | |--', cl+':', count, '-', '{0:.1%}'.format(count/float(total_objects[folder])))
+            print(' │ │ ├──', cl+':', count, '-', '{0:.1%}'.format(count/float(total_objects[folder])))
 
-        print(' | |')
-    print(' | - TFRecords files')
+        print(' │ │')
+    print(' ├─ TFRecords files')
     for record_path in tfrecord_paths:
-        print(' | | -', record_path)
-    print(' | ')
+        print(' │ ├─', record_path)
+    print(' │ ')
 
 def main(_):
     print('---------------------------------')
