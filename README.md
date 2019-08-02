@@ -1,5 +1,23 @@
 # Embedded Custom Object Detection
 
+## Table of contents
+* [Setup](#setup)
+  + [Prerequisites](#prerequisites)
+  + [Project structure](#project-structure)
+  + [Tensorflow's Object Detection API installation](#tensorflow-s-object-detection-api-installation)
+  + [Installing project dependencies](#installing-project-dependencies)
+  + [Base pre-trained model setup](#base-pre-trained-model-setup)
+  + [Select another base model (Optional)](#select-another-base-model--optional-)
+* [Test pre-trained model](#test-pre-trained-model)
+* [Training with custom dataset](#training-with-custom-dataset)
+  + [Collect dataset images](#collect-dataset-images)
+  + [Label dataset images](#label-dataset-images)
+  + [Train the model](#train-the-model)
+* [Detecting objects with a webcam](#detecting-objects-with-a-webcam)
+  + [Test server](#test-server)
+  + [Results format](#results-format)
+* [Reference](#reference)
+
 ## Setup
 This project aims to use a Raspberry Pi to detect objects, therefore this documentation is aim to setup the environment on that device. However, is not practical to do the model training on the Raspberry, so we encourage you to setup the environment on a machine that could use GPU to accelerate the training.
 
@@ -90,7 +108,7 @@ Pi_Object_Detection
 ```
 
 ### Select another base model (Optional)
-The previous step will download the pre-trained ssd_inception_v2 model, which is lite and fast for devices with low resources like the Raspberry. If you desire to use a different model, the project is compatible with any of the models included in [TensorFlow's Detection Model Zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md).
+The previous step will download the pre-trained ssd_inception_v2 model, which gives a good compromise between speed and accuracy. If you desire to use a different model, the project is compatible with any of the models included in [TensorFlow's Detection Model Zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md).
 To download one of these models, modified the configuration file `config.json`, changing the 'base_model_name' for a name to identify the new model and copying the download URL or the selected model (right-click > Copy link address)
 ```
 ...
