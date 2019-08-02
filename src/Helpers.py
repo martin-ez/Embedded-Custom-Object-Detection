@@ -4,7 +4,8 @@ from re import match
 from sys import exit
 from random import randint
 from os import path
-import json
+from ast import literal_eval
+import json, re
 
 def load_json(file_path):
     with open(file_path) as json_file:
@@ -55,3 +56,11 @@ def convert_sample_rate(sample_rate):
         return int(sample_rate.split('s')[0])
     else:
         exit(' | - ERROR: Invalid sample rate format')
+
+import re
+
+def replace(text, replacements):
+    replace_text = text
+    for (regEx, replc) in replacements:
+        replace_text = re.sub(regEx, replc, replace_text)
+    return replace_text
