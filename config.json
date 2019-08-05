@@ -6,10 +6,14 @@
     "conf_threshold": 0.5,
     "api_url": "http://127.0.0.1:5000/detection"
   },
-  "setup_training": {
-    "out_model_name": "custom_model",
+  "setup": {
     "base_model_name": "ssd_inception_v2",
-    "base_model_url": "http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz",
-    "training_class_map": "_classes",
+    "base_model_url": "http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz"
+  },
+  "training": {
+    "output_model": "PGD_model",
+    "base_model": "ssd_inception_v2",
+    "training_steps": 22000,
+    "training_class_map": "PGD_classes"
   }
 }

@@ -22,7 +22,7 @@ def load_classes():
     global class_instances
     print(' ├─ Loading classes file')
     config = load_json(os.path.join(dirname, 'config.json'))
-    classes = load_json(os.path.join(dirname, config['setup_training']['training_class_map'] + '.json'))['classes']
+    classes = load_json(os.path.join(dirname, config['training']['training_class_map'] + '.json'))['classes']
     for folder in ['train', 'test']:
         for x in range(1, len(classes)):
             class_instances[folder][classes[x]] = 0

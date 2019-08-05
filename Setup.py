@@ -28,8 +28,8 @@ def main():
     print(' - LOADING CONFIGURATION FILE')
     dirname = path.dirname(__file__)
     config = load_json(path.join(dirname, 'config.json'))
-    model_name = config['setup_training']['base_model_name']
-    download_url = config['setup_training']['base_model_url']
+    model_name = config['setup']['base_model_name']
+    download_url = config['setup']['base_model_url']
     base_name = path.basename(download_url).split('.')[0]
     print(' ├─ Configuration loaded correctly')
     out_path = path.join(dirname, 'models')
