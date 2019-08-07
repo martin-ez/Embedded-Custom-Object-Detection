@@ -27,9 +27,9 @@ def main():
     print('---------------------------------')
     print(' - LOADING CONFIGURATION FILE')
     dirname = path.dirname(__file__)
-    config = load_json(path.join(dirname, 'config.json'))
-    model_name = config['setup']['base_model_name']
-    download_url = config['setup']['base_model_url']
+    config = load_json(path.join(dirname, 'config.json'))['setup']
+    model_name = config['base_model_name']
+    download_url = config['base_model_url']
     base_name = path.basename(download_url).split('.')[0]
     print(' ├─ Configuration loaded correctly')
     out_path = path.join(dirname, 'models')

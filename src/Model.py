@@ -52,20 +52,25 @@ class Model:
         classes = output_dict[2][0].astype(np.int64)
         num_detections = int(output_dict[3][0])
 
-        detection = {}
+        class_bag = {}
+        detection = []
         for i in range(num_detections):
             box, clss, score = boxes[i], classes[i], scores[i]
             if score > self.conf_threshold:
                 class_name = 'NA'
                 if clss >= 0 and clss < len(self.classes):
                     class_name = self.classes[clss]
-                if class_name not in detection:
-                    detection[class_name] = []
-                detection[class_name].append({
+                if class_name not in class_bag:
+                    class_bag[class_name] = []
+                class_bag[class_name].append({
                 'box': box.tolist(),
                 'score': float(score)
                 })
-
+        for cls in class_bag:
+            detection.append({
+                'class': cls,
+                'instances': class_bag[cls]
+            })
         return detection
 
     def transform_boxes(self, boxes, image_shape):

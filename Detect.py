@@ -1,10 +1,16 @@
-import click
-import os, json, requests, time, atexit
+import os, json, requests, time, atexit, cv2
+from absl import flags, app
 from datetime import datetime
 from PIL import Image
 from src.Model import Model
 from src.VideoFeed import VideoFeed
-from src.Helpers import encode_image, print_result, draw_boxes, convert_sample_rate, load_json
+from src.Helpers import encode_image, print_result, draw_boxes, convert_sample_rate, load_json, show_image
+
+FLAGS = flags.FLAGS
+flags.DEFINE_string('image', None, 'Path to the image that will be detected. When omitted, a continuous detection using a web camera will begin.')
+flags.DEFINE_string('output', None, 'Path to a folder where the resulting images will be saved.')
+flags.DEFINE_boolean('sendresults', False, 'Detection process will send the results of the detection to the Rest API found on the config.json file.')
+flags.DEFINE_boolean('dontshow', False, 'Detection images will not be shown on the screen.')
 
 video_feed = None
 sample_rate = None
@@ -12,12 +18,9 @@ api_url = None
 model = None
 output_path = None
 
-@click.command()
-@click.option('--image', help='Path to image to be detected')
-@click.option('--out_folder', help='Path to save the output image')
-def main(image, out_folder):
+def main(_):
     print('---------------------------------')
-    print('- EMBEDDED DETECTION PROCESS -')
+    print('      - DETECTION PROCESS -')
     print('---------------------------------')
     print(' - LOADING CONFIGURATION FILE')
     global video_feed
@@ -26,24 +29,26 @@ def main(image, out_folder):
     global model
     global output_path
     dirname = os.path.dirname(__file__)
-    config = load_json(os.path.join(dirname, 'config.json'))
-    classes = load_json(os.path.join(dirname, config['inference']['class_map'] + '.json'))
-    sample_rate = convert_sample_rate(config['inference']['sample_rate'])
-    api_url = config['inference']['api_url']
+    config = load_json(os.path.join(dirname, 'config.json'))['inference']
+    classes = load_json(os.path.join(dirname, 'data', config['class_map'] + '.json'))['classes']
+    sample_rate = convert_sample_rate(config['sample_rate'])
+    api_url = config['api_url']
     model_config = {
-    'conf_threshold': config['inference']['conf_threshold'],
-    'model_path': os.path.join(dirname, 'models', config['inference']['model_name']),
-    'classes': classes["classes"]
+    'conf_threshold': config['conf_threshold'],
+    'model_path': os.path.join(dirname, 'models', config['model_name']),
+    'classes': classes
     }
     print(' | - Configuration set correctly')
     print(' | ')
     model = Model(model_config)
-    if out_folder:
-        output_path = os.path.expanduser(out_folder)
-    if image:
-        detect_local_image(os.path.expanduser(image))
+    if FLAGS.output:
+        output_path = os.path.expanduser(FLAGS.output)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+    if FLAGS.image:
+        detect_local_image(os.path.expanduser(FLAGS.image))
     else:
-        video_feed = VideoFeed(0)
+        video_feed = VideoFeed(0, display=not FLAGS.dontshow)
         print(' | ')
         print(' - STARTING DETECTION LOOP')
         print(' | - Sample rate: ',sample_rate, ' seconds')
@@ -65,6 +70,12 @@ def detection_loop():
         detect_image(image)
         time.sleep(sample_rate)
 
+def display_image(image):
+    if FLAGS.image is not None:
+        show_image(image)
+    else:
+        video_feed.display(image)
+
 def detect_image(image):
     print(' | - IMAGE DETECTION')
     now = datetime.now()
@@ -75,15 +86,16 @@ def detect_image(image):
     final_time = time.time() - start_time
     print_result(detection)
     print(' | | - Detection time: ', final_time, ' seconds')
+    output_img = draw_boxes(image, detection)
     if output_path:
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        draw_boxes(image, detection).save(os.path.join(output_path, timestamp + '.png'))
+        output_img.save(os.path.join(output_path, timestamp + '.png'))
         print(' | | - Output image saved at ', os.path.join(output_path, timestamp + '.png'))
-    else:
+    if not FLAGS.dontshow:
+        display_image(output_img)
+    if FLAGS.sendresults:
         files= {
             'raw_image': encode_image(image),
-            'detection_image': encode_image(draw_boxes(image, detection)),
+            'detection_image': encode_image(output_img),
             'json': (None, json.dumps({'result': detection, 'timestamp': timestamp}), 'application/json')
         }
         r = requests.post(api_url, files=files)
@@ -98,4 +110,4 @@ def cleanup():
 atexit.register(cleanup)
 
 if __name__ == '__main__':
-    main()
+    app.run(main)

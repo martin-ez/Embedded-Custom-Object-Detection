@@ -3,6 +3,7 @@ from sys import exit
 import xml.etree.ElementTree as ET
 from src.Helpers import load_json
 import tensorflow as tf
+from absl import app
 from src.Dataset_Utils import int64_feature, bytes_feature, float_list_feature, bytes_list_feature, int64_list_feature
 
 dirname = os.path.dirname(__file__)
@@ -21,8 +22,8 @@ def load_classes():
     global classes
     global class_instances
     print(' ├─ Loading classes file')
-    config = load_json(os.path.join(dirname, 'config.json'))
-    classes = load_json(os.path.join(dirname, config['training']['training_class_map'] + '.json'))['classes']
+    config = load_json(os.path.join(dirname, 'config.json'))['training']
+    classes = load_json(os.path.join(dirname, 'data', config['training_class_map'] + '.json'))['classes']
     for folder in ['train', 'test']:
         for x in range(1, len(classes)):
             class_instances[folder][classes[x]] = 0
@@ -120,7 +121,7 @@ def generate_tf_example(img_data, path):
 
 def print_dataset_analysis():
     print('---------------------------------')
-    print(' - DATASET ANALYSIS')
+    print('      - DATASET ANALYSIS -')
     print('---------------------------------')
     for folder in ['train', 'test']:
         print(' ├─', folder.upper() + 'ING SET')
@@ -136,7 +137,7 @@ def print_dataset_analysis():
 
 def main(_):
     print('---------------------------------')
-    print('- DATASET PREPARATION -')
+    print('     - DATASET PREPARATION -')
     print('---------------------------------')
     load_classes()
     for folder in ['train', 'test']:
@@ -145,4 +146,4 @@ def main(_):
     print_dataset_analysis()
 
 if __name__ == '__main__':
-    tf.app.run()
+    app.run(main)

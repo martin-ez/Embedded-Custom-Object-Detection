@@ -1,11 +1,13 @@
 from io import BytesIO
 from PIL import ImageDraw, ImageFont
-from re import match
+from re import match, sub
 from sys import exit
 from random import randint
 from os import path
 from ast import literal_eval
-import json, re
+import numpy as np
+import json
+import cv2
 
 def load_json(file_path):
     with open(file_path) as json_file:
@@ -21,10 +23,10 @@ def encode_image(image):
 def print_result(detection):
     total_objects = 0
     objects_per_class=[]
-    for cl, boxes in detection.items():
-        n_objects = len(boxes)
+    for cls in detection:
+        n_objects = len(cls['instances'])
         total_objects += n_objects
-        objects_per_class.append(' | | |-- ' + str(n_objects) + ' ' + cl)
+        objects_per_class.append(' | | |-- ' + str(n_objects) + ' ' + cls['class'])
     print(' | | - Detected ', str(total_objects), ' objects')
     for ls in objects_per_class:
         print(ls)
@@ -34,7 +36,9 @@ def draw_boxes(image, detection):
     thickness = 5
     font = ImageFont.truetype(font=font_path, size=24)
     draw = ImageDraw.Draw(image)
-    for cl, boxes in detection.items():
+    for cls in detection:
+        cl = cls['class']
+        boxes = cls['instances']
         cl_color = get_random_color()
         for b in boxes:
             label = '{} {}%'.format(cl, int(b['score']*100))
@@ -57,10 +61,34 @@ def convert_sample_rate(sample_rate):
     else:
         exit(' | - ERROR: Invalid sample rate format')
 
-import re
-
 def replace(text, replacements):
     replace_text = text
     for (regEx, replc) in replacements:
-        replace_text = re.sub(regEx, replc, replace_text)
+        replace_text = sub(regEx, replc, replace_text)
     return replace_text
+
+def pil2opencv(pil_image):
+    open_cv_image = np.array(pil_image)
+    return open_cv_image[:, :, ::-1].copy()
+
+def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
+    dim = None
+    (h, w) = image.shape[:2]
+
+    if width is None and height is None:
+        return image
+
+    if width is None:
+        r = height / float(h)
+        dim = (int(w * r), height)
+    else:
+        r = width / float(w)
+        dim = (width, int(h * r))
+
+    return cv2.resize(image, dim, interpolation = inter)
+
+def show_image(img):
+    img = pil2opencv(img)
+    cv2.imshow('Detection', image_resize(img, height=800))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()

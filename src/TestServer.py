@@ -29,10 +29,10 @@ def process_detection(image, detection, time):
 def print_result(detection, time):
     total_objects = 0
     objects_per_class=[]
-    for cl, boxes in detection.items():
-        n_objects = len(boxes)
+    for cls in detection:
+        n_objects = len(cls['instances'])
         total_objects += n_objects
-        objects_per_class.append('  - '+str(n_objects)+' '+cl)
+        objects_per_class.append('  - '+str(n_objects)+' '+cls['class'])
     print('+ Detection '+str(time))
     print('  Detected '+str(total_objects)+' objects:')
     for ls in objects_per_class:

@@ -1,19 +1,19 @@
 {
-  "inference" : {
-    "model_name": "ssd_inception_v2",
-    "class_map": "COCO_classes",
-    "sample_rate": "5s",
-    "conf_threshold": 0.5,
-    "api_url": "http://127.0.0.1:5000/detection"
-  },
   "setup": {
     "base_model_name": "ssd_inception_v2",
     "base_model_url": "http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz"
   },
   "training": {
-    "output_model": "PGD_model",
+    "output_model": "<CUSTOM_MODEL>",
     "base_model": "ssd_inception_v2",
     "training_steps": 22000,
-    "training_class_map": "PGD_classes"
+    "training_class_map": "<CUSTOM_CLASS_MAP>"
+  },
+  "inference" : {
+    "model_name": "ssd_inception_v2",
+    "class_map": "COCO_classes",
+    "sample_rate": "3s",
+    "conf_threshold": 0.5,
+    "api_url": "http://127.0.0.1:5000/detection"
   }
 }
