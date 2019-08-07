@@ -31,7 +31,16 @@ def print_result(detection):
     for ls in objects_per_class:
         print(ls)
 
-def draw_boxes(image, detection):
+def class_color_code(classes):
+    colorcode = {}
+    for cls in classes:
+        colorcode[cls] = get_random_color()
+    return colorcode
+
+def get_random_color():
+    return tuple([randint(0,200), randint(0,200), randint(0,200)])
+
+def draw_boxes(image, detection, colorcode):
     font_path = path.join(path.dirname(__file__), 'font', 'Montserrat.ttf')
     thickness = 5
     font = ImageFont.truetype(font=font_path, size=24)
@@ -39,7 +48,7 @@ def draw_boxes(image, detection):
     for cls in detection:
         cl = cls['class']
         boxes = cls['instances']
-        cl_color = get_random_color()
+        cl_color = colorcode[cls['class']]
         for b in boxes:
             label = '{} {}%'.format(cl, int(b['score']*100))
             label_size = draw.textsize(label, font)
@@ -49,9 +58,6 @@ def draw_boxes(image, detection):
             draw.text([left, bottom - label_size[1]], label, fill=(255, 255, 255), font=font)
     del draw
     return image
-
-def get_random_color():
-    return tuple([randint(0,200), randint(0,200), randint(0,200)])
 
 def convert_sample_rate(sample_rate):
     if match('^[0-9]+ms$', sample_rate) is not None:

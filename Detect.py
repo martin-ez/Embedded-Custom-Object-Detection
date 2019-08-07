@@ -4,7 +4,7 @@ from datetime import datetime
 from PIL import Image
 from src.Model import Model
 from src.VideoFeed import VideoFeed
-from src.Helpers import encode_image, print_result, draw_boxes, convert_sample_rate, load_json, show_image
+from src.Helpers import encode_image, print_result, convert_sample_rate, load_json, show_image
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string('image', None, 'Path to the image that will be detected. When omitted, a continuous detection using a web camera will begin.')
@@ -82,11 +82,10 @@ def detect_image(image):
     timestamp = str(now.year)+'_'+str(now.month)+'_'+str(now.day)+'-'+str(now.hour)+'_'+str(now.minute)+'_'+str(now.second)
     print(' | | - Timestamp: ',timestamp)
     start_time = time.time()
-    detection = model.detect(image)
+    detection, output_img = model.detect(image)
     final_time = time.time() - start_time
     print_result(detection)
     print(' | | - Detection time: ', final_time, ' seconds')
-    output_img = draw_boxes(image, detection)
     if output_path:
         output_img.save(os.path.join(output_path, timestamp + '.png'))
         print(' | | - Output image saved at ', os.path.join(output_path, timestamp + '.png'))

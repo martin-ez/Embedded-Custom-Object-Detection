@@ -2,6 +2,7 @@ import os, json, sys
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+from src.Helpers import draw_boxes, class_color_code
 
 class Model:
 
@@ -10,6 +11,7 @@ class Model:
         print(' - LOADING MODEL')
         print(' | - Setting up model configuration and classes')
         self.classes = config['classes']
+        self.colorcode = class_color_code(self.classes)
         self.conf_threshold = config["conf_threshold"]
         print(' | - Loading weights')
         PATH_TO_FROZEN_GRAPH = os.path.join(config['model_path'], 'frozen_inference_graph.pb')
@@ -43,7 +45,8 @@ class Model:
     def detect(self, image):
         image_data = self._preprocess(image)
         output_dict = self.sess.run(self.tensor_dict, feed_dict={self.image_tensor: image_data})
-        return self._postprocess(output_dict, image.size)
+        detection = self._postprocess(output_dict, image.size)
+        return detection, draw_boxes(image, detection, self.colorcode)
 
     def _postprocess(self, output_dict, image_shape):
         # all outputs are float32 numpy arrays, so convert types as appropriate
