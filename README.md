@@ -2,10 +2,10 @@
 
 A wrapper around Tensorflow's Object Detection API, which facilitates setting up object detection models, re-training them to any set of classes and running them on IoT and embedded devices like the Raspberry Pi. The project provides four utility scripts, which are easily configurable from a `config.json` configuration file.
 
-- *Setup.py:* Downloads and prepares models from Tensorflow's Detection Model Zoo to be use in inference.
-- *Dataset.py:* Converts a custom dataset, pre-labeled to PascalVOC format in XML files, to Tensorflow TFRecord format.
-- *Train.py:* Prepares and runs a training session to perform transfer learning from one pre-trained model to a new one using a custom dataset.
-- *Detect.py:* Runs a model to perform inference to an image or using a webcam videofeed.
+- **Setup.py:** Downloads and prepares models from Tensorflow's Detection Model Zoo to be use in inference.
+- **Dataset.py:** Converts a custom dataset, pre-labeled to PascalVOC format in XML files, to Tensorflow TFRecord format.
+- **Train.py:** Prepares and runs a training session to perform transfer learning from one pre-trained model to a new one using a custom dataset.
+- **Detect.py:** Runs a model to perform inference to an image or using a webcam videofeed.
 
 The following documentation will explain how to use each script and the options it provides.
 
