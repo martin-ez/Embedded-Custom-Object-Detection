@@ -2,14 +2,14 @@
 
 A wrapper around Tensorflow's Object Detection API, which facilitates setting up object detection models, re-training them to any set of classes and running them on IoT and embedded devices like the Raspberry Pi. The project provides four utility scripts, which are easily configurable from a `config.json` configuration file.
 
-- **Setup.py:** Downloads and prepares models from Tensorflow's Detection Model Zoo to be use in inference.
+- **Setup.py:** Downloads and prepares models from Tensorflow's Detection Model Zoo to be used in inference.
 - **Dataset.py:** Converts a custom dataset, pre-labeled to PascalVOC format in XML files, to Tensorflow TFRecord format.
 - **Train.py:** Prepares and runs a training session to perform transfer learning from one pre-trained model to a new one using a custom dataset.
 - **Detect.py:** Runs a model to perform inference to an image or using a webcam videofeed.
 
 The following documentation will explain how to use each script and the options it provides.
 
-This was develop as part of a University of Los Andes project, that intends to create an interactive dashboard to monitor an aquaponics system. Using the tools provided, the dashboard will detect fishes and plants in the system to record their movement and growth over time.
+This was developed as part of a University of Los Andes project, that intends to create an interactive dashboard to monitor an aquaponics system. Using the tools provided, the dashboard will detect fish and plants in the system to record their movement and growth over time.
 
 ## Table of contents
 
@@ -39,7 +39,7 @@ This was develop as part of a University of Los Andes project, that intends to c
 - [Reference](#reference)
 
 ## Environment setup
-The end goal of the project is to run the trained detection model in IoT devices like the Raspberry Pi. However, the training of the model is a resource demanding task, so a more capable computer should be use in that step. For that reason, is best if you setup the project environment in both of the devices. For  simplicity, we will focus on the preparation of the Raspberry Pi, since it's almost the same as in any linux machine. The main difference is the installation of tensorflow, where for the training machine you can install tensorflow-gpu if you have a CUDA enabled GPU to accelerate the training process.
+The end goal of the project is to run the trained detection model in IoT devices like the Raspberry Pi. However, the training of the model is a resource demanding task, so a more capable computer should be used in that step. For that reason, it's best if you set up the project environment in both of the devices. For  simplicity, we will focus on the preparation of the Raspberry Pi, since it's almost the same as in any Linux machine. The main difference is the installation of Tensorflow, where for the training machine you can install tensorflow-gpu if you have a CUDA enabled GPU to accelerate the training process.
 
 ### Prerequisites
 Make sure to have installed a version of Python 3 and pip on the raspberry. Python 3.6 can be installed following the next commands:
@@ -54,7 +54,7 @@ sudo make install
 sudo pip3 install --upgrade pip
 ```
 
-OpenCV, Protobuf and Tensorflow need to be installed in the device. User EdjeElectronics on Github writed [this detailed tutorial](https://github.com/EdjeElectronics/TensorFlow-Object-Detection-on-the-Raspberry-Pi) on how to install them, you can follow steps 1 through 4. At the end of step 4 you will be instruct to reboot the Raspberry Pi, do so and then return to this file.
+OpenCV, Protobuf and Tensorflow need to be installed on the device. User EdjeElectronics on Github wrote [this detailed tutorial](https://github.com/EdjeElectronics/TensorFlow-Object-Detection-on-the-Raspberry-Pi) on how to install them, you can follow steps 1 through 4. At the end of step 4 you will be instructed to reboot the Raspberry Pi, do so and then return to this file.
 
 ### Project structure
 We will create the folder structure for the project. First create a root folder (You can name this folder however you'd like):
@@ -116,7 +116,7 @@ pip3 install --user -r requirements.txt
 
 The project stores the different models on a `models` folder, which will be created when running the `Setup.py` script for the first time. Inside this folder, each model will have a folder with the name of the model as its name, inside it you will find the frozen inference graph to use in detection and the model checkpoint to use as a start point in training. You will also see a pipeline configuration file that describes the model training environment and a checkpoints folder if the model is an output of a training session.
 
-The folder structure will look something like:
+The folder structure will look something like this:
 ```
 ECOD
 ├─ ...
@@ -161,7 +161,7 @@ Run the Setup script to download the base pre-trained model:
 ```
 python3 Setup.py
 ```
-This will download the model and located in a new folder, which contains everything needed to run the model:
+This will download the model and be located in a new folder, which contains everything needed to run the model:
 ```
 ECOD
 ├─ models
@@ -177,7 +177,7 @@ ECOD
 
 ### Select another base model (Optional)
 The previous step will download the pre-trained ssd_inception_v2 model, which gives a good compromise between speed and accuracy. If you desire to use a different model, the project is compatible with any of the COCO-trained 'boxes' models included in [TensorFlow's Detection Model Zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md).
-To download one of these models, modified the configuration file `config.json`, changing the 'base_model_name' for a name to identify the new model and copying the download URL or the selected model (right-click > Copy link address)
+To download one of these models, modify the configuration file `config.json`, changing the 'base_model_name' to a name that will identify the new model and copying the download URL or the selected model (right-click > Copy link address)
 ```
 "setup": {
   "base_model_name": "<MODEL_IDENTIFIER>",
@@ -191,12 +191,12 @@ python3 Setup.py
 A new folder in the `models` location should be created with the selected model inside.
 
 ### Test pre-trained model
-Once the environment have been setup, you can test that the image detection is working correctly by using:
+Once the environment has been set up, you can test that the image detection is working correctly by using:
 ```
 python3 Detect.py ---image <Path-to-test-image>
 ```
 Where `<Path-to-test-image>` is the location of an image to be detected. (Alternatively, you can omit the `--image` property to start a continuous detection taking images from a webcam connected to the device.)
-You should see a message of the objects found in the image, and a image with the bounding-boxes of them.
+You should see a message on console of the objects found in the image, and an image with the bounding-boxes placed on them.
 
 ## Dataset.py
 
@@ -205,15 +205,15 @@ Usage:
 python3 Datatset.py
 ```
 
-### Training with custom dataset
-The models feature on TensorFlow's Detection Model Zoo are trained on the COCO (Common Objects in Context) dataset, which has 80 different classes including person, car, cat, dog and others. We will use a technique known as Transfer Learning to re-purpose an already trained model so it can detect new classes. This technique have proven to reduce training time and the need for bigger datasets, since the convolution network already learned to detect basic shapes and patterns.
+### Training with a custom dataset
+The models featured on TensorFlow's Detection Model Zoo are trained on the COCO (Common Objects in Context) dataset, which has 80 different classes including person, car, cat, dog and others. We will use a technique known as Transfer Learning to re-purpose an already trained model so it can detect new classes. This practice has proven to reduce training time and the need for bigger datasets, since the convolution network already has learned to detect basic shapes and patterns.
 
-A model learns to detect new classes using pre-classified images as its training data. This way, the human knowledge use to classify this images is transfer into the model weights and parameters. This means that you will have to prepare a dataset for the model to train on. There are three steps to train the model with our custom data: collect images, label the images and train the model.
+A model learns to detect new classes using pre-classified images as its training data. This way, the human knowledge used to classify this images is transfer into the model weights and parameters. This means that you will have to prepare a dataset for the model to train with. There are three steps to train the model with our custom data: collect images, label the images and train the model.
 
 ### Collect dataset images
-The first step is to collect as many images as possible containing the classes we want to identify. Depending on the complexity and number of classes, the number of images required for a good training may vary. Normally, 150 to 200 images is a good minimum. But the bigger the training dataset, the better the model can perform. Is also a good idea to use a wide range of images, using different light conditions, different backgrounds, showcasing the classes at different angles and distances, etc. This will help the model to generalize better, and therefore be able to predict the classes on an image more accurately.
+The first step is to collect as many images as possible containing the classes we want to identify. Depending on the complexity and number of classes, the number of images required for a proper training may vary. Normally, 150 to 200 images is an acceptable minimum, but the bigger the training dataset, the better the model can perform. It's also a good idea to use a wide range of images, using different light conditions, different backgrounds, showcasing the classes at different angles and distances, etc. This will help the model to generalize better, and therefore be able to predict the classes on an image more accurately.
 
-After you collect all the images, you will have to divide them between a training set and a test set. The common way to do this is to select 10% of the images at random to be the testing set and the rest is use for training. This is needed so we have a set of test images that the model will not see during training and will work as a way to measure the training process performance.
+After you collect all the images, you will have to divide them between a training set and a test set. The common way to do this is to select 10% of the images at random to be the testing set and the rest is used for training. This is needed so we have a set of test images that the model will not see during training and will work as a way to measure the training process performance.
 
 Using the laptop or desktop computer you will perform the training on, copy the images you collected inside the `data` folder of the project. Putting the train and test images in there respective folders.
 ```
@@ -225,9 +225,9 @@ ECOD
 ```
 
 ### Label dataset images
-We require to label each image, identifying each class instance present in the image and drawing its bounding box. To do this, we can use tzutalin's [labelImg](https://github.com/tzutalin/labelImg) utility. This tools allow you to open a directory and navigate each image with a predefined set of classes, making the labeling process more easy. It will generate an XML file with the data in PascalVOC format for each image you label, saving them alongside the images automatically.
+We need to label each image, identifying each class instance present in the image and drawing its bounding box. To do this, we can use tzutalin's [labelImg](https://github.com/tzutalin/labelImg) utility. This tool allow you to open a directory and navigate each image with a predefined set of classes, making the labeling process more easy. It will generate an XML file with the data in PascalVOC format for each image you label, saving them alongside the images automatically.
 
-The utility should have been installed in the first step and can be run issuing the command:
+The utility should have been installed in the first step and can be ran issuing the command:
 ```
 labelImg
 ```
@@ -235,7 +235,7 @@ But if a problem occurs you can follow the repo instructions.
 
 ### Writing class map file
 
-When all the training and testing images are label, we will create a class map file to define the classes that the model will train on. This file must be in a json format and be located in the `data` folder. Included in this repo is a class map for the COCO dataset, named `COCO_classes.json` you can use it as a guide. For example, a class map for a datatset of Piano, Guitar and Drumsticks could look like:
+When all the training and testing images are labeled, we will create a class map file to define the classes that the model will train on. This file must be in a json format and be located in the `data` folder. Included in this repo is a class map for the COCO dataset, named `COCO_classes.json` you can use it as a guide. For example, a class map for a datatset of Piano, Guitar and Drumsticks could look like:
 ```
 {
   "classes": [
@@ -247,6 +247,7 @@ When all the training and testing images are label, we will create a class map f
 }
 ```
 Two things to keep in mind when writing the class map is that the first position always needs to be a default or undefined class, and the label names should be exactly as you wrote them on the labelImg utility.
+
 Open the configuration file, `config.json`, and write the name of the class map you created on the `training_class_map` field, omitting the .json extension:
 ```
 {
@@ -273,7 +274,7 @@ Usage:
 ```
 python3 Train.py [--freeze <CHECKPOINT>]
 ```
-- `freeze` Number of the checkpoint to be frozen. When this flag is included the training process is not perform, only the freeze graph process.
+- `freeze` Number of the checkpoint to be frozen. When this flag is included the training process won't start, only the freeze graph process.
 
 Configuration in `config.json`:
 ```
@@ -289,22 +290,22 @@ Configuration in `config.json`:
 }
 ```
 - `output_model` name of the model that will be generated with the training session.
-- `base_model` name of the model that will be use as a starting point for the training.
+- `base_model` name of the model that will be used as a starting point for the training.
 - `training_steps` number of training steps the model will perform.
-- `training_class_map` name of class map of the dataset use for training, located on the 'data' folder and omitting the .json extension.
+- `training_class_map` name of class map of the dataset used for training, located on the 'data' folder and omitting the .json extension.
 
 ### Preparing and running training process
 
-As mention previously, the training process demands a lot of computing power, so its not a good idea to perform the training on the Raspberry Pi. Follow the installation steps in a laptop or desktop computer so the training can be done in that machine. The training process can be significantly speed up using a GPU, if the chosen computer has a CUDA enabled GPU you can uninstall tensorflow and install tensorflow-gpu, CUDA y cuDNN. You can know more about this setup on [Tensorflow's official guide](https://www.tensorflow.org/install/gpu).
+As mention previously, the training process demands a lot of computing power, so it's not a good idea to perform the training on the Raspberry Pi. Follow the installation steps on a laptop or desktop computer so the training can be done in that machine. The training process can be significantly sped up using a GPU, if the chosen computer has a CUDA enabled GPU you can uninstall tensorflow and install tensorflow-gpu, CUDA and cuDNN. You can know more about this setup on [Tensorflow's official guide](https://www.tensorflow.org/install/gpu).
 
-Modified the `config.json` configuration file, selecting the base model, the output model, the number of training steps and the class map file.
+Modify the `config.json` configuration file, selecting the base model, the output model, the number of training steps and the class map file.
 
 Start the training session with:
 ```
 python3 Train.py
 ```
 
-Depending on the number of steps, this could take several hours to complete. Every 100 steps, you should see a message on console showing the step number and the current loss of the model. In general we want a loss below 1.0 and it could take 20000 steps or more to achieve it. This may vary depending on the base model chosen and the size and quality of the dataset.
+Depending on the number of steps, this could take several hours to complete. Every 100 steps, you should see a message on console showing the step number and the current loss of the model. In general, we want a loss below 1.0 and it could take 20,000 steps or more to achieve it. This may vary depending on the base model chosen and the size and quality of the dataset.
 
 ### Recovering from training session failures
 
@@ -384,11 +385,11 @@ Configuration in `config.json`:
 ```
 - `model_name` identifier of the model to be used for detection. This should be a name of a folder in the 'models' folder.
 - `class_map` name of class map used by the model, located on the 'data' folder and omitting the .json extension.
-- `sample_rate` the time between each detection. This can be declare on seconds (s) or milliseconds (ms).
+- `sample_rate` the time between each detection. This can be declared in seconds (s) or milliseconds (ms).
 - `conf_threshold` minimum confidence value the model should output on an object to be considered a detection. A value in range 0 - 1.
 - `api_url` URL of the rest service where the model will send the results.
 
-Right now, the detection process only supports usb webcameras, no picamera.
+Right now, the detection process only supports USB web cameras, not PiCamera.
 
 ### Test server
 For testing purposes, a test server is included to intercept the detection results. It can be started by running:
