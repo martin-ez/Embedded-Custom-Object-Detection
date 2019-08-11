@@ -42,23 +42,52 @@ This was developed as part of a University of Los Andes project, that intends to
 The end goal of the project is to run the trained detection model in IoT devices like the Raspberry Pi. However, the training of the model is a resource demanding task, so a more capable computer should be used in that step. For that reason, it's best if you set up the project environment in both of the devices. For  simplicity, we will focus on the preparation of the Raspberry Pi, since it's almost the same as in any Linux machine. The main difference is the installation of Tensorflow, where for the training machine you can install tensorflow-gpu if you have a CUDA enabled GPU to accelerate the training process.
 
 ### Prerequisites
-Make sure to have installed a version of Python 3 and pip on the raspberry. Python 3.6 can be installed following the next commands:
+
+Due to the unusual architecture of the Raspberry Pi's processor, we will need to compile some of the main dependencies from source code. Unfortunately, this process takes quite a long time, between 1 to 2 hours for all the packages.
+
+First update Raspberry Pi packages and firmware:
 ```
-sudo apt-get install python3-dev libffi-dev libssl-dev -y
-wget https://www.python.org/ftp/python/3.6.3/Python-3.6.3.tar.xz
-tar xJf Python-3.6.3.tar.xz
-cd Python-3.6.3
-./configure
-make
-sudo make install
-sudo pip3 install --upgrade pip
+sudo apt-get update
+sudo apt-get upgrade
 ```
 
-OpenCV, Protobuf and Tensorflow need to be installed on the device. User EdjeElectronics on Github wrote [this detailed tutorial](https://github.com/EdjeElectronics/TensorFlow-Object-Detection-on-the-Raspberry-Pi) on how to install them, you can follow steps 1 through 4. At the end of step 4 you will be instructed to reboot the Raspberry Pi, do so and then return to this file.
+Follow [this guide](https://gist.github.com/BMeu/af107b1f3d7cf1a2507c9c6429367a3b) to install Python 3.5. Newer version of Python is not supported yet by Tensorflow on Pi's architecture.
+Then, install OpenCV 3.4 following [this guide](https://www.life2coding.com/install-opencv-3-4-0-python-3-raspberry-pi-3/).
+
+We also need to install Google's Protocol Buffers, or protobuf. Go to the [official releases](https://github.com/protocolbuffers/protobuf/releases) and select the latest one, and copy it's link address (right-click > Copy link address).
+
+Download and unzip the tar file:
+```
+wget https://github.com/protocolbuffers/protobuf/releases/download/v3.9.1/protobuf-all-3.9.1.tar.gz
+tar -vxzf ./protobuf-3.9.1.tar.gz
+cd ./protobuf-3.9.1/
+```
+Download dependencies and prepare the compilation:
+```
+sudo apt-get install autoconf libtool
+./autogen.sh
+./configure
+```
+Compile and install protobuf, these steps could take quite a long time to complete:
+```
+make
+sudo make install
+sudo ldconfig
+```
+Check that the installation completed correctly:
+```
+protoc --version
+```
+
+Finally, install tensorflow using pip:
+```
+sudo pip3 install tensorflow
+```
 
 ### Project structure
 We will create the folder structure for the project. First create a root folder (You can name this folder however you'd like):
 ```
+cd ~
 mkdir Pi_Object_Detection
 cd Pi_Object_Detection
 ```
@@ -109,7 +138,7 @@ cd ECOD
 ```
 Install the project dependencies:
 ```
-pip3 install --user -r requirements.txt
+sudo pip3 install -r requirements.txt
 ```
 
 ## Models folder structure
@@ -227,11 +256,18 @@ ECOD
 ### Label dataset images
 We need to label each image, identifying each class instance present in the image and drawing its bounding box. To do this, we can use tzutalin's [labelImg](https://github.com/tzutalin/labelImg) utility. This tool allow you to open a directory and navigate each image with a predefined set of classes, making the labeling process more easy. It will generate an XML file with the data in PascalVOC format for each image you label, saving them alongside the images automatically.
 
-The utility should have been installed in the first step and can be ran issuing the command:
+The utility is available in PyPI, so you should be able to install it by running:
+```
+sudo pip3 install labelimg
+```
+But if a problem occurs you can follow the repo instructions.
+
+Then run it issuing:
 ```
 labelImg
 ```
-But if a problem occurs you can follow the repo instructions.
+The GUI of the utility should appear. Open the folder with the images and start labeling them.
+
 
 ### Writing class map file
 

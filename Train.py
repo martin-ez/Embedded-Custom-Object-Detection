@@ -79,9 +79,10 @@ def write_config_file():
         (r'PATH_TO_BE_CONFIGURED/.+val\.record', testrecord_abs_path)
     ]
     for line in text:
-        edited_text += replace(line, replacements)
-        if 'feature_extractor' in line:
-            edited_text += '      override_base_feature_extractor_hyperparams: true\n'
+        if 'batch_norm_trainable' not in line:
+            edited_text += replace(line, replacements)
+            if 'feature_extractor' in line:
+                edited_text += '      override_base_feature_extractor_hyperparams: true\n'
     with open(config_file, 'w') as f:
         f.write(edited_text)
     print('│')
