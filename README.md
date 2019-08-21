@@ -51,10 +51,55 @@ sudo apt-get update
 sudo apt-get upgrade
 ```
 
-Follow [this guide](https://gist.github.com/BMeu/af107b1f3d7cf1a2507c9c6429367a3b) to install Python 3.5. Newer version of Python is not supported yet by Tensorflow on Pi's architecture.
-Then, install OpenCV 3.4 following [this guide](https://www.life2coding.com/install-opencv-3-4-0-python-3-raspberry-pi-3/).
+#### Python 3.5
+Tensorflow only supports Python3.5 on the Raspberry Pi's architecture, so we need to use this version of Python.
 
-We also need to install Google's Protocol Buffers, or protobuf. Go to the [official releases](https://github.com/protocolbuffers/protobuf/releases) and select the latest one, and copy it's link address (right-click > Copy link address).
+Install all the needed dependencies first:
+```
+sudo apt-get install build-essential libc6-dev
+sudo apt-get install libncurses5-dev libncursesw5-dev libreadline6-dev
+sudo apt-get install libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev
+sudo apt-get install libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev
+sudo apt-get install python3-dev
+```
+Download and unzip the Python source code:
+```
+wget https://www.python.org/ftp/python/3.5.7/Python-3.5.7.tgz
+tar -zxvf Python-3.5.7.tgz
+cd Python-3.5.7
+```
+Compile and install, this might take quite a long time due to the Raspberry performance. Run:
+```
+./configure
+make -j4
+sudo make install
+```
+Finally, check that the installation was successful and, optionally, delete the folder to save space:
+```
+python3 --version
+cd ..
+sudo rm -fr ./Python-3.5.7*
+```
+
+#### OpenCV
+
+We gonna use OpenCV to manage our video feed from the webcam. We need to install some image and video codex dependencies to install the library on the device.
+
+You can install them running:
+```
+sudo apt-get install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
+sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+sudo apt-get install libxvidcore-dev libx264-dev
+sudo apt-get install qt4-dev-tools
+```
+And then install OpenCV using pip:
+```
+sudo pip3 install opencv-contrib-python
+```
+
+#### Protobuf
+
+The Object Detection API uses Google's Protocol Buffers, or protobuf. This library allows Tensorflow to serialize data quickly.
 
 Download and unzip the tar file:
 ```
@@ -70,18 +115,13 @@ sudo apt-get install autoconf libtool
 ```
 Compile and install protobuf, these steps could take quite a long time to complete:
 ```
-make
+make -j4
 sudo make install
 sudo ldconfig
 ```
 Check that the installation completed correctly:
 ```
 protoc --version
-```
-
-Finally, install tensorflow using pip:
-```
-sudo pip3 install tensorflow
 ```
 
 ### Project structure
