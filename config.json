@@ -12,7 +12,7 @@
   "inference" : {
     "model_name": "ssd_inception_v2",
     "class_map": "COCO_classes",
-    "sample_rate": "3s",
+    "sample_rate": "5s",
     "conf_threshold": 0.5,
     "api_url": "http://127.0.0.1:5000/detection"
   }

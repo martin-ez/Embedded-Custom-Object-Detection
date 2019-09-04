@@ -48,37 +48,57 @@ Due to the unusual architecture of the Raspberry Pi's processor, we will need to
 First update Raspberry Pi packages and firmware:
 ```
 sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get dist-upgrade
 ```
 
-#### Python 3.5
-Tensorflow only supports Python3.5 on the Raspberry Pi's architecture, so we need to use this version of Python.
+#### Increase swap space
 
-Install all the needed dependencies first:
+One easy way to improve the performance of the Raspberry Pi is increasing it's available swap memory.
+
+Open the swap file:
 ```
-sudo apt-get install build-essential libc6-dev
-sudo apt-get install libncurses5-dev libncursesw5-dev libreadline6-dev
-sudo apt-get install libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev
-sudo apt-get install libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev
-sudo apt-get install python3-dev
+sudo nano /etc/dphys-swapfile
 ```
-Download and unzip the Python source code:
+Change the default value of 100 to 1024 megabytes, then save and close the file.
 ```
-wget https://www.python.org/ftp/python/3.5.7/Python-3.5.7.tgz
-tar -zxvf Python-3.5.7.tgz
-cd Python-3.5.7
+CONF_SWAPSIZE=1024
 ```
-Compile and install, this might take quite a long time due to the Raspberry performance. Run:
+Restart the service:
 ```
-./configure
-make -j4
-sudo make install
+sudo /etc/init.d/dphys-swapfile stop
+sudo /etc/init.d/dphys-swapfile start
 ```
-Finally, check that the installation was successful and, optionally, delete the folder to save space:
+
+#### Tensorflow
+
+Tensorflow offers a pecompiled version for Raspberry devices, so the installation it's quite easy.
+
+First install the atlas library dependency:
 ```
-python3 --version
-cd ..
-sudo rm -fr ./Python-3.5.7*
+sudo apt-get install libatlas-base-dev
+```
+Then install tensorflow using pip:
+```
+sudo pip3 install tensorflow
+```
+Some other packages are needed for the Object Detection API, they can be install with pip:
+```
+sudo pip3 install lxml jupyter matplotlib cython
+```
+Finally, make sure you have the python-tk library installed:
+```
+sudo apt-get install python-tk
+```
+
+#### Pillow
+
+The project uses pillow for image editing. To install it, the free type library is needed:
+```
+sudo apt-get install libfreetype6-dev
+```
+And install Pillow using pip:
+```
+sudo pip3 install pillow
 ```
 
 #### OpenCV
@@ -94,7 +114,7 @@ sudo apt-get install qt4-dev-tools
 ```
 And then install OpenCV using pip:
 ```
-sudo pip3 install opencv-contrib-python
+sudo apt install python3-opencv
 ```
 
 #### Protobuf
@@ -104,8 +124,8 @@ The Object Detection API uses Google's Protocol Buffers, or protobuf. This libra
 Download and unzip the tar file:
 ```
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.9.1/protobuf-all-3.9.1.tar.gz
-tar -vxzf ./protobuf-3.9.1.tar.gz
-cd ./protobuf-3.9.1/
+tar -vxzf protobuf-all-3.9.1.tar.gz
+cd protobuf-3.9.1
 ```
 Download dependencies and prepare the compilation:
 ```
@@ -115,7 +135,7 @@ sudo apt-get install autoconf libtool
 ```
 Compile and install protobuf, these steps could take quite a long time to complete:
 ```
-make -j4
+make
 sudo make install
 sudo ldconfig
 ```
@@ -262,7 +282,7 @@ A new folder in the `models` location should be created with the selected model 
 ### Test pre-trained model
 Once the environment has been set up, you can test that the image detection is working correctly by using:
 ```
-python3 Detect.py ---image <Path-to-test-image>
+python3 Detect.py --image <Path-to-test-image>
 ```
 Where `<Path-to-test-image>` is the location of an image to be detected. (Alternatively, you can omit the `--image` property to start a continuous detection taking images from a webcam connected to the device.)
 You should see a message on console of the objects found in the image, and an image with the bounding-boxes placed on them.
