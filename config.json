@@ -12,8 +12,13 @@
   "inference" : {
     "model_name": "ssd_inception_v2",
     "class_map": "COCO_classes",
-    "sample_rate": "5s",
+    "sample_rate": "30s",
     "conf_threshold": 0.5,
-    "api_url": "http://127.0.0.1:5000/detection"
+    "api_url": "http://acuaponicos.lozanogomez.com/api/",
+    "acuaponico_code": "ac01",
+    "distance_conversion": {
+      "height": 200,
+      "width": 200
+    }
   }
 }

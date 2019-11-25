@@ -6,7 +6,7 @@ from random import randint
 from os import path
 from ast import literal_eval
 import numpy as np
-import json
+import json, base64
 import cv2
 
 def load_json(file_path):
@@ -16,20 +16,16 @@ def load_json(file_path):
 
 def encode_image(image):
     bytes = BytesIO()
+    image = image.convert("RGB")
     image.save(bytes, format='JPEG')
-    bytes.seek(0)
-    return bytes
+    img_str = base64.b64encode(bytes.getvalue()).decode('utf-8')
+    return "data:image/jpeg;base64,"+str(img_str)
 
 def print_result(detection):
-    total_objects = 0
-    objects_per_class=[]
-    for cls in detection:
-        n_objects = len(cls['instances'])
-        total_objects += n_objects
-        objects_per_class.append(' | | |-- ' + str(n_objects) + ' ' + cls['class'])
-    print(' | | - Detected ', str(total_objects), ' objects')
-    for ls in objects_per_class:
-        print(ls)
+    print(' | | - Detected ', str(len(detection)), ' objects')
+    for element in detection:
+        print(' | | |-- ' + element['physical_element_code'] + ' - H: ' + str(element['height']) + ' W: ' + str(element['width']))
+
 
 def class_color_code(classes):
     colorcode = {}
@@ -44,20 +40,20 @@ def draw_boxes(image, detection, colorcode):
     font_path = path.join(path.dirname(__file__), 'font', 'Montserrat.ttf')
     thickness = 5
     font = ImageFont.truetype(font=font_path, size=24)
-    draw = ImageDraw.Draw(image)
-    for cls in detection:
-        cl = cls['class']
-        boxes = cls['instances']
-        cl_color = colorcode[cls['class']]
-        for b in boxes:
-            label = '{} {}%'.format(cl, int(b['score']*100))
-            label_size = draw.textsize(label, font)
-            left, right, top, bottom = b['box']
-            draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=thickness, fill=cl_color)
-            draw.rectangle([left, bottom - label_size[1], left + label_size[0], bottom], fill=cl_color)
-            draw.text([left, bottom - label_size[1]], label, fill=(255, 255, 255), font=font)
+    drawImage = image.copy()
+    draw = ImageDraw.Draw(drawImage)
+    for element in detection:
+        cl = element['physical_element_code']
+        cl_color = colorcode[cl]
+        b = element['values']
+        label = '{} {}%'.format(cl, int(element['score']*100))
+        label_size = draw.textsize(label, font)
+        left, right, top, bottom = b
+        draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=thickness, fill=cl_color)
+        draw.rectangle([left, bottom - label_size[1], left + label_size[0], bottom], fill=cl_color)
+        draw.text([left, bottom - label_size[1]], label, fill=(255, 255, 255), font=font)
     del draw
-    return image
+    return drawImage
 
 def convert_sample_rate(sample_rate):
     if match('^[0-9]+ms$', sample_rate) is not None:

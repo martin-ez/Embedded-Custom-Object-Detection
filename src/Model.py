@@ -13,6 +13,8 @@ class Model:
         self.classes = config['classes']
         self.colorcode = class_color_code(self.classes)
         self.conf_threshold = config["conf_threshold"]
+        self.acuaponico_code = config["acuaponico_code"]
+        self.distance_conversion = config["distance_conversion"]
         print(' | - Loading weights')
         PATH_TO_FROZEN_GRAPH = os.path.join(config['model_path'], 'frozen_inference_graph.pb')
         sys.path.append('..')
@@ -33,7 +35,7 @@ class Model:
         self.image_tensor = self.graph.get_tensor_by_name('image_tensor:0')
 
         print(' | - Warming up model')
-        self.detect(Image.new('RGB', (640, 640), (128,128,128)))
+        self.detect(Image.new('RGB', (640, 640), (128,128,128)), 000)
         print(' | - Model loaded successfully')
         print(' | ')
 
@@ -42,39 +44,39 @@ class Model:
         image_np = np.array(resized.getdata()).reshape((size[0], size[0], 3)).astype(np.uint8)
         return np.expand_dims(image_np, axis=0)
 
-    def detect(self, image):
+    def detect(self, image, timestamp):
         image_data = self._preprocess(image)
         output_dict = self.sess.run(self.tensor_dict, feed_dict={self.image_tensor: image_data})
-        detection = self._postprocess(output_dict, image.size)
+        detection = self._postprocess(output_dict, image.size, timestamp)
         return detection, draw_boxes(image, detection, self.colorcode)
 
-    def _postprocess(self, output_dict, image_shape):
+    def _postprocess(self, output_dict, image_shape, timestamp):
         # all outputs are float32 numpy arrays, so convert types as appropriate
         boxes = self.transform_boxes(output_dict[0][0], image_shape)
         scores = output_dict[1][0]
         classes = output_dict[2][0].astype(np.int64)
         num_detections = int(output_dict[3][0])
 
-        class_bag = {}
-        detection = []
+        detections = []
         for i in range(num_detections):
             box, clss, score = boxes[i], classes[i], scores[i]
             if score > self.conf_threshold:
                 class_name = 'NA'
                 if clss >= 0 and clss < len(self.classes):
                     class_name = self.classes[clss]
-                if class_name not in class_bag:
-                    class_bag[class_name] = []
-                class_bag[class_name].append({
-                'box': box.tolist(),
-                'score': float(score)
+                box = box.tolist()
+                box_height, box_width = self.convert2distance(box, image_shape)
+                detections.append({
+                    'physical_element_code': class_name,
+                    'acuaponico_code': self.acuaponico_code,
+                    'metric_code': 'size',
+                    'timestamp': timestamp,
+                    'values': box,
+                    'height': box_height,
+                    'width': box_width,
+                    'score': float(score)
                 })
-        for cls in class_bag:
-            detection.append({
-                'class': cls,
-                'instances': class_bag[cls]
-            })
-        return detection
+        return detections
 
     def transform_boxes(self, boxes, image_shape):
         im_width, im_height = image_shape
@@ -85,3 +87,12 @@ class Model:
             boxes[i] = (left, right, top, bottom)
 
         return boxes
+
+    def convert2distance(self, box, image_shape):
+        left, right, top, bottom = box
+        im_width, im_height = image_shape
+        im_distance_width = self.distance_conversion['width']
+        im_distance_height = self.distance_conversion['height']
+        box_height = im_distance_height * (bottom - top) / im_height
+        box_width = im_distance_width * (right - left) / im_width
+        return box_height, box_width

@@ -1,6 +1,6 @@
 import os, json, requests, time, atexit, cv2
-from absl import flags, app
 from datetime import datetime
+from absl import flags, app
 from PIL import Image
 from src.Model import Model
 from src.VideoFeed import VideoFeed
@@ -17,6 +17,7 @@ sample_rate = None
 api_url = None
 model = None
 output_path = None
+acuaponico_code = None
 
 def main(_):
     print('---------------------------------')
@@ -28,6 +29,7 @@ def main(_):
     global api_url
     global model
     global output_path
+    global acuaponico_code
     dirname = os.path.dirname(__file__)
     config = load_json(os.path.join(dirname, 'config.json'))['inference']
     classes = load_json(os.path.join(dirname, 'data', config['class_map'] + '.json'))['classes']
@@ -36,8 +38,11 @@ def main(_):
     model_config = {
     'conf_threshold': config['conf_threshold'],
     'model_path': os.path.join(dirname, 'models', config['model_name']),
-    'classes': classes
+    'classes': classes,
+    'acuaponico_code': config['acuaponico_code'],
+    'distance_conversion': config['distance_conversion']
     }
+    acuaponico_code = config['acuaponico_code']
     print(' | - Configuration set correctly')
     print(' | ')
     model = Model(model_config)
@@ -78,26 +83,30 @@ def display_image(image):
 
 def detect_image(image):
     print(' | - IMAGE DETECTION')
+    timestamp = time.time()
     now = datetime.now()
-    timestamp = str(now.year)+'_'+str(now.month)+'_'+str(now.day)+'-'+str(now.hour)+'_'+str(now.minute)+'_'+str(now.second)
-    print(' | | - Timestamp: ',timestamp)
-    start_time = time.time()
-    detection, output_img = model.detect(image)
-    final_time = time.time() - start_time
+    date = str(now.year)+'-'+str(now.month)+'-'+str(now.day)
+    dateHour = str(now.year)+'_'+str(now.month)+'_'+str(now.day)+'-'+str(now.hour)+'_'+str(now.minute)+'_'+str(now.second)
+    print(' | | - Timestamp: ', timestamp)
+    detection, output_img = model.detect(image, timestamp)
+    final_time = time.time() - timestamp
     print_result(detection)
     print(' | | - Detection time: ', final_time, ' seconds')
     if output_path:
-        output_img.save(os.path.join(output_path, timestamp + '.png'))
-        print(' | | - Output image saved at ', os.path.join(output_path, timestamp + '.png'))
+        output_img.save(os.path.join(output_path, dateHour + '.jpg'))
+        print(' | | - Output image saved at ', os.path.join(output_path, dateHour + '.jpg'))
     if not FLAGS.dontshow:
         display_image(output_img)
     if FLAGS.sendresults:
-        files= {
+        images = {
             'raw_image': encode_image(image),
             'detection_image': encode_image(output_img),
-            'json': (None, json.dumps({'result': detection, 'timestamp': timestamp}), 'application/json')
+            'date': date
         }
-        r = requests.post(api_url, files=files)
+        r1 = requests.post(api_url + 'register-physical-element-metric-value/', json=detection)
+        print(' | | - Object request status: ', r1.text)
+        r2 = requests.post(api_url + 'acuaponicos/'+acuaponico_code+'/register-image/', data=images)
+        print(' | | - Image request status: ', r2.text)
         print(' | | - Detection results received by ', api_url)
     print(' | | ')
 
