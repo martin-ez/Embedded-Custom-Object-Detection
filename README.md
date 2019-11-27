@@ -158,6 +158,9 @@ git clone --recurse-submodules https://github.com/tensorflow/models.git
 Clone this repository in the root folder as well:
 ```
 git clone https://github.com/martin-ez/Embedded-Custom-Object-Detection.git ECOD
+cd ECOD
+git checkout aquaponics
+cd ..
 ```
 You should have the following structure:
 ```
