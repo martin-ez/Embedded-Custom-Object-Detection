@@ -478,7 +478,12 @@ Configuration in `config.json`:
     "class_map": "COCO_classes",
     "sample_rate": "5s",
     "conf_threshold": 0.5,
-    "api_url": "http://127.0.0.1:5000/detection"
+    "api_url": "http://127.0.0.1:5000/detection",
+    "acuaponico_code": "ac01",
+    "distance_conversion": {
+      "height": 200,
+      "width": 200
+    }
   }
 }
 ```
@@ -487,6 +492,8 @@ Configuration in `config.json`:
 - `sample_rate` the time between each detection. This can be declared in seconds (s) or milliseconds (ms).
 - `conf_threshold` minimum confidence value the model should output on an object to be considered a detection. A value in range 0 - 1.
 - `api_url` URL of the rest service where the model will send the results.
+- `acuaponico_code` Unique identifier of the aquaponic system being observe.
+- `distance_conversion` Width and height observe by the camera, use to interpolate the size of the identified objects.
 
 Right now, the detection process only supports USB web cameras, not PiCamera.
 
