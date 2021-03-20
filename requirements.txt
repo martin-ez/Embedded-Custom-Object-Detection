@@ -7,7 +7,7 @@ flask-cors==3.0.8
 flask==1.1.1
 idna==2.8
 itsdangerous==1.1.0
-jinja2==2.10.1
+jinja2==2.11.3
 markupsafe==1.1.1
 progressbar==2.5
 requests==2.22.0
